@@ -8,6 +8,7 @@
 import Foundation
 import Combine
 
+
 class SettingsViewModel: ObservableObject {
     private let authService: AuthServiceProtocol
     @Published var lastRefreshTime: Date?
