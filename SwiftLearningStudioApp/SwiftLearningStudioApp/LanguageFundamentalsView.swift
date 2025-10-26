@@ -102,7 +102,6 @@ struct LanguageFundamentalsView: View {
         let add3 :(Int ,Int) -> Int = {$0 + $1}
         print("using fully inferred:: \(add3(10,20))")
     }
-    
 //Passing clouser as a funtion parameter
     @State var closureResult = 0
     func functionWithClosureAsParameter(a:Int , b:Int , clousarCall:(Int ,Int) -> Int ) -> Int
@@ -142,16 +141,41 @@ struct LanguageFundamentalsView: View {
                         let result1 = functionWithClosureAsParameter(a:10 ,b:20 ,clousarCall:{(a:Int ,b:Int) -> Int in return a+b })
                         print("using fully explicit in function Call::\(result1)")
                         //2.Semi explicit
-                        let result2 = functionWithClosureAsParameter(a:20,b:30 ,clousarCall:{(x:Int ,y:Int) -> Int in x + y})
+                        let result2 = functionWithClosureAsParameter(a:20,b:30 ,clousarCall:{(a:Int ,b:Int) -> Int in a + b})
                         print("using semi explicit in function call::\(result2)")
                         //3.Type inferred (LHS)
-                        let result3 = functionWithClosureAsParameter(a:20 ,b:20 ){(x ,y) in x+y}
+                        let result3 = functionWithClosureAsParameter(a:20 ,b:20 ){(a ,b) in a+b}
                         print("using type inferred in function call::\(result3)")
                         //4.Fully inferred (shorthand)
                         let result4 = functionWithClosureAsParameter(a:10 ,b:40)
                         {$0 + $1}
                         print("using fully inferred in function call::\(result4)")
                     }
+                    //Button is also a clouser It inner syntax is init(action:@escaping () -> Void ,lable:() -> Label)
+                    //Button have 2 types
+                    //1.fully explicit i.e "action + label" both action and label as clousers,
+                    //2.simplified “title + action” only action as clouser and tittle
+                    
+                    //1.fully explicit we see 2 clousers action and label "action + Label"
+                    Button(
+                        action: { () -> Void in print("Someone tapped me for Explicit clouser")},
+                        label: {  Text("Button for Explicit clouser") }
+                    )
+                    //2.simplified “title + action”
+                    Button("Button for semi Explicit clouser" ,action:{print("Someone tapped me for semi Explicit clouser")})
+        //Tailing clouser
+               // what is trailing clouser : Trailing closure is som ethsing that in a dunction if the clouser is the last parameter we can write out of the body ,lets apply for above all clousers
+        //1.
+                Button(action:{() -> Void in print("Someone tapped me for Label as trailingClouser")})
+                {
+                    Text("Button for Label as trailingClouser") // 👈 This is the TRAILING CLOSURE
+                }// Hear label "Text("I'm the button")" came out of the Button body
+        //2.
+               Button("Button for action as trailingClouser")
+                {
+                    print("Someone tapped me for action as trailingClouser") // 👈 This is the TRAILING CLOSURE ,
+                    // Hear action came out of the Button body
+                }
                     //Closures*****//
                     Spacer()
                 }//VStack
