@@ -6,8 +6,11 @@
 //
 
 import SwiftUI
+import Combine
+import Foundation
 
 struct LanguageFundamentalsView: View {
+
 // var: mutable
 // let: immutable constant
 // Type inference: compiler deduces types
@@ -104,6 +107,7 @@ struct LanguageFundamentalsView: View {
     }
 //Passing clouser as a funtion parameter
     @State var closureResult = 0
+    @StateObject private var loginVM =  LoginViewModel(authProtocolObj: AuthImplementation())
     func functionWithClosureAsParameter(a:Int , b:Int , clousarCall:(Int ,Int) -> Int ) -> Int
     {
         return clousarCall(a,b)
@@ -134,7 +138,7 @@ struct LanguageFundamentalsView: View {
                         let tupleRetunData = tupleFunction()
                         print(tupleRetunData.age)
                     }
-                    //****Closures
+//****Closures
                     Button("All Clouser related tap::\(closureResult)"){
                         AllClosureStuff()
                         //Now 1.Stright or fully explicit
@@ -163,25 +167,96 @@ struct LanguageFundamentalsView: View {
                     )
                     //2.simplified “title + action”
                     Button("Button for semi Explicit clouser" ,action:{print("Someone tapped me for semi Explicit clouser")})
-        //Tailing clouser
+            // ****Tailing clouser
                // what is trailing clouser : Trailing closure is som ethsing that in a dunction if the clouser is the last parameter we can write out of the body ,lets apply for above all clousers
-        //1.
+               //1.
                 Button(action:{() -> Void in print("Someone tapped me for Label as trailingClouser")})
-                {
-                    Text("Button for Label as trailingClouser") // 👈 This is the TRAILING CLOSURE
+                { Text("Button for Label as trailingClouser") // 👈 This is the TRAILING CLOSURE
                 }// Hear label "Text("I'm the button")" came out of the Button body
-        //2.
+               //2.
                Button("Button for action as trailingClouser")
-                {
-                    print("Someone tapped me for action as trailingClouser") // 👈 This is the TRAILING CLOSURE ,
-                    // Hear action came out of the Button body
+                { print("Someone tapped me for action as trailingClouser") // 👈 This is the TRAILING CLOSURE  // Hear action came out of the Button body
                 }
-                    //Closures*****//
+//****Using a triling clouser in realtime example
+                    Button("Login Authentication"){
+                        loginVM.login(username: "Admin", password: "12234")
+                    } .alert(isPresented: $loginVM.showAlert ) {
+                        if loginVM.isLoggedIn {
+                return Alert(title: Text("✅ Success"),message: Text("Operation completed successfully!"),
+                                dismissButton: .default(Text("OK")) )}
+                        else {
+            return Alert(title: Text("❌ Failed"),message: Text("Something went wrong, please try again."),
+                                dismissButton: .default(Text("OK")))}
+                    }
+//Using a triling clouser in realtime example****//
+//Closures*****//
                     Spacer()
-                }//VStack
+                } //VStack
                 .padding(20)
-            }//ZStack
+            } //ZStack
             .frame(maxWidth: .infinity ,alignment: .leading)
+        }
+    }
+}
+
+// ****Tailing clouser as complition handler
+struct userInfo {
+    var name:String
+    var age:Int
+}
+
+protocol AutherProtocol {
+    func getAutuntication (name:String ,password:String , complitionHandler:@escaping((Bool) -> Void))
+    func FetchData (complitionHandler:@escaping(Result<userInfo , Error>) -> Void)
+}
+
+class AuthImplementation:AutherProtocol
+{
+    func getAutuntication(name:String ,password:String, complitionHandler: @escaping (Bool) -> Void) {
+        DispatchQueue.global().asyncAfter(deadline: .now() + 2){
+             let ResultBool = name == "Admin" && password == "1234"
+                complitionHandler(ResultBool)
+        }
+    }
+    func FetchData(complitionHandler: @escaping (Result<userInfo , Error>) -> Void) {
+        DispatchQueue.global().asyncAfter(deadline: .now() + 1){
+            let shouldSucceed = Bool.random()
+            if shouldSucceed {
+                let resultData = userInfo(name: "Aman", age: 24)
+                complitionHandler(.success(resultData))
+            }
+            else{
+                var errorDescription: String? { return "Something went wrong" }
+                complitionHandler(.failure(errorDescription as! Error))
+            }
+        }
+    }
+}
+
+class LoginViewModel :ObservableObject {
+    private let authProtocolObj :AutherProtocol
+    @Published var isLoggedIn = false
+    @Published var errorMessage: String?
+    @Published  var showAlert = false
+    
+    init(authProtocolObj :AutherProtocol){
+        self.authProtocolObj = authProtocolObj
+    }
+    func login(username: String, password: String) {
+        authProtocolObj.getAutuntication(name: username, password: password){ [weak self] responseData in
+            DispatchQueue.main.async {
+                if responseData {
+                    print("Login Success")
+                    self?.isLoggedIn = true
+                    self?.showAlert = true
+                }
+                else{
+                    print("Login Failed")
+                    self?.errorMessage = "Invalid credentials"
+                    self?.isLoggedIn = false
+                    self?.showAlert = true
+                }
+            }
         }
     }
 }

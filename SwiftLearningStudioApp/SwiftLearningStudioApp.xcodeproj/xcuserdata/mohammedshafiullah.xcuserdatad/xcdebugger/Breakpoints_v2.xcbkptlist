@@ -3,4 +3,52 @@
    uuid = "300B1754-1980-47CA-843F-50F0C5BA5E4B"
    type = "1"
    version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "732A37F6-E875-4BC4-89B2-CAE290A58081"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "SwiftLearningStudioApp/LanguageFundamentalsView.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "250"
+            endingLineNumber = "250"
+            landmarkName = "login(username:password:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "732A37F6-E875-4BC4-89B2-CAE290A58081 - 268a03bb173cdc90"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "SwiftLearningStudioApp.LoginViewModel.__allocating_init(authProtocolObj: SwiftLearningStudioApp.AutherProtocol) -&gt; SwiftLearningStudioApp.LoginViewModel"
+                  moduleName = "SwiftLearningStudioApp.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/mohammedshafiullah/Documents/iOS/Git/iOSconceptsInSwiftUI/SwiftLearningStudioApp/SwiftLearningStudioApp/LanguageFundamentalsView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "0"
+                  endingLineNumber = "0">
+               </Location>
+               <Location
+                  uuid = "732A37F6-E875-4BC4-89B2-CAE290A58081 - 2419d0dd55b2d94f"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "SwiftLearningStudioApp.LoginViewModel.init(authProtocolObj: SwiftLearningStudioApp.AutherProtocol) -&gt; SwiftLearningStudioApp.LoginViewModel"
+                  moduleName = "SwiftLearningStudioApp.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/mohammedshafiullah/Documents/iOS/Git/iOSconceptsInSwiftUI/SwiftLearningStudioApp/SwiftLearningStudioApp/LanguageFundamentalsView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "250"
+                  endingLineNumber = "250">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
 </Bucket>
