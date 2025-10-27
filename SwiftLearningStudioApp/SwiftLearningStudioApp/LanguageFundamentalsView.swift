@@ -10,6 +10,9 @@ import Combine
 import Foundation
 
 struct LanguageFundamentalsView: View {
+    //Static Properties
+    @State private var usernameForAuthentication = ""
+    @State private var passwordForAuthentication = ""
 
 // var: mutable
 // let: immutable constant
@@ -105,6 +108,7 @@ struct LanguageFundamentalsView: View {
         let add3 :(Int ,Int) -> Int = {$0 + $1}
         print("using fully inferred:: \(add3(10,20))")
     }
+    
 //Passing clouser as a funtion parameter
     @State var closureResult = 0
     @StateObject private var loginVM =  LoginViewModel(authProtocolObj: AuthImplementation())
@@ -177,18 +181,29 @@ struct LanguageFundamentalsView: View {
                Button("Button for action as trailingClouser")
                 { print("Someone tapped me for action as trailingClouser") // 👈 This is the TRAILING CLOSURE  // Hear action came out of the Button body
                 }
-//****Using a triling clouser in realtime example
-                    Button("Login Authentication"){
-                        loginVM.login(username: "Admin", password: "12234")
-                    } .alert(isPresented: $loginVM.showAlert ) {
-                        if loginVM.isLoggedIn {
-                return Alert(title: Text("✅ Success"),message: Text("Operation completed successfully!"),
-                                dismissButton: .default(Text("OK")) )}
-                        else {
-            return Alert(title: Text("❌ Failed"),message: Text("Something went wrong, please try again."),
-                                dismissButton: .default(Text("OK")))}
-                    }
-//Using a triling clouser in realtime example****//
+//****Trailing clouser in Networking call real time clouser
+                    VStack(){
+                        HStack(spacing: 10){
+                            TextField("Username", text: $usernameForAuthentication)
+                            TextField("Password", text: $passwordForAuthentication)
+                            Button("Login Auth"){
+                                loginVM.login(username: usernameForAuthentication, password: passwordForAuthentication)
+                            } .alert(isPresented: $loginVM.showAlert ) {
+                                if loginVM.isLoggedIn {
+                                    return Alert(title: Text("✅ Success"),message: Text("Operation completed successfully!"),dismissButton: .default(Text("OK")) )}
+                                else {
+                                    return Alert(title: Text("❌ Failed"),message: Text("Something went wrong, please try again."), dismissButton: .default(Text("OK")))}
+                            }
+                        }  .padding()
+                            .background(Color.gray.opacity(0.25)) // light gray background for the HStack
+                            .cornerRadius(8)
+                           
+                        Text("hint: Username: Admin , Password: 1234")
+                            .foregroundStyle(Color.green.opacity(0.80))
+                            .font(.system(size: 13, weight: .regular))
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }.padding(.top ,0)
+//Trailing clouser in Networking call real time clouser****//
 //Closures*****//
                     Spacer()
                 } //VStack
@@ -199,7 +214,8 @@ struct LanguageFundamentalsView: View {
     }
 }
 
-// ****Tailing clouser as complition handler
+
+//****Trailing clouser in Networking call real time clouser
 struct userInfo {
     var name:String
     var age:Int
@@ -209,7 +225,6 @@ protocol AutherProtocol {
     func getAutuntication (name:String ,password:String , complitionHandler:@escaping((Bool) -> Void))
     func FetchData (complitionHandler:@escaping(Result<userInfo , Error>) -> Void)
 }
-
 class AuthImplementation:AutherProtocol
 {
     func getAutuntication(name:String ,password:String, complitionHandler: @escaping (Bool) -> Void) {
@@ -232,7 +247,6 @@ class AuthImplementation:AutherProtocol
         }
     }
 }
-
 class LoginViewModel :ObservableObject {
     private let authProtocolObj :AutherProtocol
     @Published var isLoggedIn = false
@@ -260,6 +274,8 @@ class LoginViewModel :ObservableObject {
         }
     }
 }
+//****Trailing clouser in Networking call real time clouser
+
 
 #Preview {
     LanguageFundamentalsView()
