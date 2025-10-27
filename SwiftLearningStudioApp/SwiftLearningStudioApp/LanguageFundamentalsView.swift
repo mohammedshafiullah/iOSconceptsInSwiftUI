@@ -26,10 +26,10 @@ struct LanguageFundamentalsView: View {
 //**Type alias//
     typealias Age = Int
     var myAge:Age = 25
-    func fetchData(complition : @escaping (Result<String , Error>) -> Void)
+    func serviceCall(complition : @escaping (Result<String , Error>) -> Void)
     {}
     typealias complitionCanBeWrittenAs = (Result<String , Error>) -> Void
-    func fetchData2(complition :@escaping complitionCanBeWrittenAs)
+    func serviceCall2(complition :@escaping complitionCanBeWrittenAs)
     {}
 //Type alias **//
     
@@ -111,6 +111,7 @@ struct LanguageFundamentalsView: View {
     
 //Passing clouser as a funtion parameter
     @State var closureResult = 0
+    @State var errorMessage:String? = ""
     @StateObject private var loginVM =  LoginViewModel(authProtocolObj: AuthImplementation())
     func functionWithClosureAsParameter(a:Int , b:Int , clousarCall:(Int ,Int) -> Int ) -> Int
     {
@@ -183,25 +184,40 @@ struct LanguageFundamentalsView: View {
                 }
 //****Trailing clouser in Networking call real time clouser
                     VStack(){
+                        Text("hint: Username: Admin , Password: 1234")
+                            .foregroundStyle(Color.green.opacity(0.80))
+                            .font(.system(size: 13, weight: .regular))
+                            .frame(maxWidth: .infinity, alignment: .leading)
                         HStack(spacing: 10){
                             TextField("Username", text: $usernameForAuthentication)
                             TextField("Password", text: $passwordForAuthentication)
                             Button("Login Auth"){
-                                loginVM.login(username: usernameForAuthentication, password: passwordForAuthentication)
+                                if let info = loginVM.userdData
+                                {
+                                    loginVM.textisVisible = true
+                                }
+                                else {
+                                    loginVM.textisVisible = false
+                                    loginVM.login(username: usernameForAuthentication, password: passwordForAuthentication)
+                                }
                             } .alert(isPresented: $loginVM.showAlert ) {
                                 if loginVM.isLoggedIn {
-                                    return Alert(title: Text("✅ Success"),message: Text("Operation completed successfully!"),dismissButton: .default(Text("OK")) )}
+                                    return Alert(title: Text("✅ Success"),message: Text(loginVM.showAlertMessage ?? "Success"),dismissButton: .default(Text("OK") , action: {
+                                        loginVM.userdData = nil
+                                    }) )}
                                 else {
-                                    return Alert(title: Text("❌ Failed"),message: Text("Something went wrong, please try again."), dismissButton: .default(Text("OK")))}
+                                    return Alert(title: Text("❌ Failed"),message: Text(loginVM.showAlertMessage ?? "Invalid Credentials"), dismissButton: .default(Text("OK")))}
                             }
                         }  .padding()
                             .background(Color.gray.opacity(0.25)) // light gray background for the HStack
                             .cornerRadius(8)
                            
-                        Text("hint: Username: Admin , Password: 1234")
+                        Text(loginVM.showAlertMessage ?? "No data found")
                             .foregroundStyle(Color.green.opacity(0.80))
                             .font(.system(size: 13, weight: .regular))
                             .frame(maxWidth: .infinity, alignment: .leading)
+                            .opacity(loginVM.textisVisible ? 1 : 0)
+                        
                     }.padding(.top ,0)
 //Trailing clouser in Networking call real time clouser****//
 //Closures*****//
@@ -214,18 +230,15 @@ struct LanguageFundamentalsView: View {
     }
 }
 
-
 //****Trailing clouser in Networking call real time clouser
 struct userInfo {
     var name:String
-    var age:Int
 }
-
-protocol AutherProtocol {
+protocol AuthProtocol {
     func getAutuntication (name:String ,password:String , complitionHandler:@escaping((Bool) -> Void))
-    func FetchData (complitionHandler:@escaping(Result<userInfo , Error>) -> Void)
+    func FetchData (loginStatus :Bool,complitionHandler:@escaping(Result<userInfo , Error>) -> Void)
 }
-class AuthImplementation:AutherProtocol
+class AuthImplementation:AuthProtocol
 {
     func getAutuntication(name:String ,password:String, complitionHandler: @escaping (Bool) -> Void) {
         DispatchQueue.global().asyncAfter(deadline: .now() + 2){
@@ -233,11 +246,11 @@ class AuthImplementation:AutherProtocol
                 complitionHandler(ResultBool)
         }
     }
-    func FetchData(complitionHandler: @escaping (Result<userInfo , Error>) -> Void) {
+    func FetchData( loginStatus :Bool,complitionHandler: @escaping (Result<userInfo , Error>) -> Void) {
         DispatchQueue.global().asyncAfter(deadline: .now() + 1){
-            let shouldSucceed = Bool.random()
+            let shouldSucceed = loginStatus
             if shouldSucceed {
-                let resultData = userInfo(name: "Aman", age: 24)
+                let resultData = userInfo(name: "Admin")
                 complitionHandler(.success(resultData))
             }
             else{
@@ -248,34 +261,53 @@ class AuthImplementation:AutherProtocol
     }
 }
 class LoginViewModel :ObservableObject {
-    private let authProtocolObj :AutherProtocol
+    private let authProtocolObjLocal :AuthProtocol
+    @Published var userdData: userInfo?
     @Published var isLoggedIn = false
-    @Published var errorMessage: String?
     @Published  var showAlert = false
+    @Published var showAlertMessage: String?
+    @Published  var textisVisible = false
     
-    init(authProtocolObj :AutherProtocol){
-        self.authProtocolObj = authProtocolObj
+    init(authProtocolObj :AuthProtocol){
+        self.authProtocolObjLocal = authProtocolObj
     }
     func login(username: String, password: String) {
-        authProtocolObj.getAutuntication(name: username, password: password){ [weak self] responseData in
+        authProtocolObjLocal.getAutuntication(name: username, password: password){ [weak self] responseData in
             DispatchQueue.main.async {
                 if responseData {
                     print("Login Success")
                     self?.isLoggedIn = true
                     self?.showAlert = true
+                    self?.showAlertMessage = "Login Success"
+                    self?.fetchData()
                 }
                 else{
                     print("Login Failed")
-                    self?.errorMessage = "Invalid credentials"
+                    self?.showAlertMessage = "Invalid credentials"
                     self?.isLoggedIn = false
                     self?.showAlert = true
                 }
             }
         }
     }
-}
+    func fetchData(){
+        authProtocolObjLocal.FetchData(loginStatus: self.isLoggedIn ){
+            [weak self] responseDatais in
+            DispatchQueue.main.async{
+                switch responseDatais{
+                case.success(let userData):
+                    self?.userdData = userData
+                    self?.textisVisible = true
+                    self?.showAlertMessage = "\(String(describing: self?.userdData?.name))"
+                case.failure(let error):
+                    self?.showAlert = true
+                    self?.showAlertMessage = "\(error)"
+                }
+                }
+            }
+        }
+    }
 //****Trailing clouser in Networking call real time clouser
-
 
 #Preview {
     LanguageFundamentalsView()
