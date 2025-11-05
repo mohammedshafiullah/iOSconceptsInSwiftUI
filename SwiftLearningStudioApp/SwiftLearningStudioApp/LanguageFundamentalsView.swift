@@ -117,6 +117,31 @@ struct LanguageFundamentalsView: View {
     {
         return clousarCall(a,b)
     }
+    
+    func reversetheString(){
+        let name = "HappyEnding"
+        var result = ""
+        for i in name {
+            result = "\(i)" + result
+        }
+        print("result :::\(result)")
+    }
+    
+    //Opeque type
+    protocol Shape {
+        func area() -> Double
+    }
+    struct Circle: Shape {
+        var radius: Double
+        func area() -> Double {
+            return Double.pi * radius * radius
+        }
+    }
+    // Function returns "some Shape" — caller doesn’t know it’s a Circle
+    func makeShape() -> some Shape {
+        return Circle(radius: 5)
+    }
+    
     var body: some View {
         ScrollView{
             ZStack(){
@@ -183,7 +208,7 @@ struct LanguageFundamentalsView: View {
                 { print("Someone tapped me for action as trailingClouser") // 👈 This is the TRAILING CLOSURE  // Hear action came out of the Button body
                 }
 //****Trailing clouser in Networking call real time clouser
-                    VStack(){
+                    VStack(spacing:0){
                         Text("hint: Username: Admin , Password: 1234")
                             .foregroundStyle(Color.green.opacity(0.80))
                             .font(.system(size: 13, weight: .regular))
@@ -217,10 +242,73 @@ struct LanguageFundamentalsView: View {
                             .font(.system(size: 13, weight: .regular))
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .opacity(loginVM.textisVisible ? 1 : 0)
-                        
                     }.padding(.top ,0)
+// High order functions
+                    Button("Btn High order functions"){
+                 //MAP
+                 let number = [1,2,3,4]
+                 //1.fully explicit
+                 let explicitMap = number.map ({(index:Int) -> Int in return index + index })
+                 print("explicitMap::\(explicitMap)")
+                 //2.Semi explicit
+                let semiExplicitMap = number.map ({(index:Int) in index + index })
+                 print("semiExplicit::\(semiExplicitMap)")
+                //3.Type inferred (LHS)
+                 let typeInferredMap = number.map({number in number + number})
+                 print("typeInferredMap:::\(typeInferredMap)")
+                //4.shorthand
+                 let shortHandMap = number.map{$0 + $0}
+                 print("shortHandMap:::\(shortHandMap)")
+               //Types of Maps
+               //1.Compact map
+               let compactMapInput = ["1" , "2" , "Three"]
+               let resultOfCompactMap = compactMapInput.compactMap{Int($0)}
+               //2.Flat map
+               let flatMapInput = [[1,2],[3,4] ,[5,6]]
+               let flatMapResult = flatMapInput.flatMap{($0)}
+               print("flatMapInput::::\(flatMapResult)")
+              //3.Filter
+               let filterInput = [1,2,3,4,5,6,7,8]
+               let filterInputString = ["Anaya" ,"Ananya" ,"Isha" , "Rizwan"]
+               let filterEvenOdd = filterInput.filter{$0 % 2 == 0 }
+               let filterComparion = filterInput.filter{$0 > 2}
+               let filterString = filterInputString.filter{$0.hasPrefix("I")}
+               print("filterEvenOdd::::\(filterEvenOdd)")
+               print("filterComparion::::\(filterComparion)")
+               print("filterInputString::::\(filterString)")
+                //Reduce
+               let ReduceNumbers = [2,12,15,16,8,10,6,11]
+               let reduceSumallValues = ReduceNumbers.reduce(10) { $0 + $1 } // hear always understant value in reduce brackets () is the latest value of $0
+               print("reduceSumallValues:::: \(reduceSumallValues)")
+               let names = ["Apple", "Google", "Microsoft"]
+               let reduceString = names.reduce("Companies: ") { $0 + $1 + " " }
+               print(reduceString)
+               let reduceAndGetSumOfEvenNumbers = ReduceNumbers.reduce(0){$1 % 2 == 0 ? $0 + $1 : $0}
+               print("reduceAndGetSumOfEvenNumbers::::\(reduceAndGetSumOfEvenNumbers)")
+              //Examples now using Highorder functions
+             //1.Reverse the string "HappyEnding"
+             let  name = "HappyEnding"
+            let resultReverseClouserWay = name.reduce("") {  String($1) + $0 }
+            print(resultReverseClouserWay)
+            print(reversetheString())
+                    }.padding(.top ,-20)
 //Trailing clouser in Networking call real time clouser****//
 //Closures*****//
+                    Button("Btn Generics,AssosiatedTypes,Opeque Types"){
+                        //Calling Generics
+                        let IntTypeis = Box(item:10)
+                        IntTypeis.result()
+                        let StringTypeis = Box(item:"Hello Shafi")
+                        StringTypeis.result()
+                    //Calling Associatedtypes
+                        let IntOfAssosiatedTypeInt = confirmassociatedtypeInt(item:20)
+                        IntOfAssosiatedTypeInt.result()
+                        let IntOfAssosiatedTypeString = confirmassociatedtypeString(item:"HelloIndia")
+                        IntOfAssosiatedTypeString.result()
+                        //calling opeque type
+                        print("OpequeType:\(makeShape())")
+                    }.padding(.top ,-10)
+                    
                     Spacer()
                 } //VStack
                 .padding(20)
@@ -229,6 +317,36 @@ struct LanguageFundamentalsView: View {
         }
     }
 }
+
+//Generics
+struct Box<T>
+{
+    var item:T
+    func result (){
+        print("What is there in the box::\(item)")
+    }
+}
+//Assosiated Types
+protocol Assosi{
+    associatedtype myassociatedtype
+    var item : myassociatedtype {get}
+    func result()
+}
+
+struct confirmassociatedtypeInt : Assosi {
+    var item: Int
+    func result() {
+        print("myassociatedtype ::\(item)")
+    }
+}
+struct confirmassociatedtypeString: Assosi {
+    var item: String
+    func result() {
+        print("myassociatedtype ::\(item)")
+    }
+}
+
+
 
 //****Trailing clouser in Networking call real time clouser
 struct userInfo {
@@ -308,6 +426,10 @@ class LoginViewModel :ObservableObject {
         }
     }
 //****Trailing clouser in Networking call real time clouser
+//High order functions
+//MAP
+
+
 
 #Preview {
     LanguageFundamentalsView()
